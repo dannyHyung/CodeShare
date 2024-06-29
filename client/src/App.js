@@ -88,7 +88,7 @@ function App() {
         <Grid item xs={8} sx={{ display: 'flex' }}>
           <QuestionField question={question} handleQuestionChange={handleChange('question')} />
         </Grid>
-        <Grid item xs={4} sx={{}}>
+        <Grid item xs={4} sx={{display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-start'}}>
           <LanguageSelector language={language} handleLanguageChange={handleChange('language')} />
         </Grid>
       </Grid>
@@ -100,7 +100,7 @@ function App() {
         </Grid>
         <Grid item xs={4}>
           <OutputBox output={output} />
-          <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+          <Box sx={{ display: 'flex', justifyContent: 'flex-start' }}>
             <RunButton runCode={runCode} />
           </Box>
         </Grid>
