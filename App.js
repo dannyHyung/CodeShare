@@ -1,4 +1,3 @@
-// server.js
 const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
@@ -31,7 +30,6 @@ io.on('connection', (socket) => {
 
     socket.on('codeChange', (code) => {
         currentCode = code; // Update the current code
-        // console.log(`Code received: ${code}`);
         socket.broadcast.emit('codeChange', code);
     });
 
@@ -45,8 +43,9 @@ io.on('connection', (socket) => {
         socket.broadcast.emit('questionChange', question);
     });
 
-    socket.on('runCode', ({code, language}) => {
+    socket.on('runCode', ({ code, language }) => {
         let command;
+        let cleanupCallback = () => { }; // Initialize with an empty function
 
         switch (language) {
             case 'javascript':
@@ -56,21 +55,41 @@ io.on('connection', (socket) => {
                 const tmpFilePython = tmp.fileSync({ postfix: '.py' });
                 fs.writeFileSync(tmpFilePython.name, code);
                 command = `python ${tmpFilePython.name}`;
+                cleanupCallback = () => tmpFilePython.removeCallback();
                 break;
             case 'java':
-                const tmpFileJava = tmp.fileSync({ postfix: '.java' });
-                fs.writeFileSync(tmpFileJava.name, code);
-                command = `javac ${tmpFileJava.name} && java ${path.basename(tmpFileJava.name, '.java')}`;
-                break;
-            case 'csharp':
-                const tmpFileCSharp = tmp.fileSync({ postfix: '.cs' });
-                fs.writeFileSync(tmpFileCSharp.name, code);
-                command = `mcs ${tmpFileCSharp.name} && mono ${path.basename(tmpFileCSharp.name, '.cs')}.exe`;
+                const classNameMatch = code.match(/public\s+class\s+(\w+)/);
+                if (!classNameMatch) {
+                    socket.emit('codeOutput', 'Invalid Java code: no public class found');
+                    return;
+                }
+                const className = classNameMatch[1];
+                const tmpFileJava = tmp.fileSync({ postfix: `.java` });
+                const javaFilePath = path.join(path.dirname(tmpFileJava.name), `${className}.java`);
+                fs.writeFileSync(javaFilePath, code);
+                command = `javac ${javaFilePath} && java -cp ${path.dirname(javaFilePath)} ${className}`;
+                cleanupCallback = () => {
+                    tmpFileJava.removeCallback();
+                    const classFile = path.join(path.dirname(javaFilePath), `${className}.class`);
+                    if (fs.existsSync(classFile)) {
+                        fs.unlinkSync(classFile);
+                    }
+                    if (fs.existsSync(javaFilePath)) {
+                        fs.unlinkSync(javaFilePath);
+                    }
+                };
                 break;
             case 'cpp':
                 const tmpFileCpp = tmp.fileSync({ postfix: '.cpp' });
                 fs.writeFileSync(tmpFileCpp.name, code);
                 command = `g++ ${tmpFileCpp.name} -o ${tmpFileCpp.name}.out && ${tmpFileCpp.name}.out`;
+                cleanupCallback = () => {
+                    tmpFileCpp.removeCallback();
+                    const exeFile = `${tmpFileCpp.name}.out`;
+                    if (fs.existsSync(exeFile)) {
+                        fs.unlinkSync(exeFile);
+                    }
+                };
                 break;
             default:
                 socket.emit('codeOutput', 'Unsupported language');
@@ -81,6 +100,7 @@ io.on('connection', (socket) => {
             const result = error ? stderr : stdout;
             socket.emit('codeOutput', result);
             socket.broadcast.emit('codeOutput', result); // Broadcast to all clients
+            cleanupCallback(); // Clean up temporary files
         });
     });
 
