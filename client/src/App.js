@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import io from 'socket.io-client';
-import { Box, Button, Grid, Paper, Typography, TextField, MenuItem, Select, FormControl, InputLabel } from '@mui/material';
+import { Box, Button, Grid, Paper, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Avatar, Typography } from '@mui/material';
 import CodeEditor from './components/CodeEditor';
 import QuestionField from './components/QuestionField';
 import LanguageSelector from './components/LanguageSelector';
 import RunButton from './components/RunButton';
 import OutputBox from './components/OutputBox';
-
+import UsernameDialog from './components/UsernameDialog';
 
 const socket = io(process.env.REACT_APP_BACKEND_URL || 'http://localhost:4000');
 
@@ -15,10 +15,20 @@ function App() {
   const [output, setOutput] = useState('');
   const [question, setQuestion] = useState('');
   const [language, setLanguage] = useState('javascript');
+  const [username, setUsername] = useState('');
+  const [users, setUsers] = useState([]);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   useEffect(() => {
     socket.on('connect', () => {
       console.log('Connected to server');
+      const storedUsername = localStorage.getItem('username');
+      if (storedUsername) {
+        setUsername(storedUsername);
+        socket.emit('setUsername', storedUsername);
+      } else {
+        setIsDialogOpen(true);
+      }
     });
 
     socket.on('initialCode', (initialCode) => {
@@ -41,6 +51,10 @@ function App() {
 
     socket.on('languageChange', (newLanguage) => {
       setLanguage(newLanguage);
+    });
+
+    socket.on('usersUpdate', (onlineUsers) => {
+      setUsers(onlineUsers);
     });
 
     socket.on('codeOutput', (result) => {
@@ -68,6 +82,14 @@ function App() {
     socket.emit('runCode', { code, language });
   };
 
+  const handleUsernameSubmit = () => {
+    if (username.trim()) {
+      localStorage.setItem('username', username);
+      socket.emit('setUsername', username);
+      setIsDialogOpen(false);
+    }
+  };
+
   const handleChange = (field) => (event) => {
     const value = field === 'code' ? event : event.target.value;
     if (field === 'code') {
@@ -84,11 +106,18 @@ function App() {
 
   return (
     <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column', bgcolor: '#1e1e1e', color: '#ffffff' }}>
+      <UsernameDialog
+        open={isDialogOpen}
+        username={username}
+        onUsernameChange={(e) => setUsername(e.target.value)}
+        onSubmit={handleUsernameSubmit}
+      />
+
       <Grid container spacing={2} sx={{ flexGrow: 1, p: 2 }}>
         <Grid item xs={8} sx={{ display: 'flex' }}>
           <QuestionField question={question} handleQuestionChange={handleChange('question')} />
         </Grid>
-        <Grid item xs={4} sx={{display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-start'}}>
+        <Grid item xs={4} sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-start' }}>
           <LanguageSelector language={language} handleLanguageChange={handleChange('language')} />
         </Grid>
       </Grid>
@@ -98,10 +127,18 @@ function App() {
             <CodeEditor code={code} language={language} setCode={handleChange('code')} />
           </Paper>
         </Grid>
-        <Grid item xs={4}>
+        <Grid item xs={4} sx={{ position: 'relative' }}>
           <OutputBox output={output} />
           <Box sx={{ display: 'flex', justifyContent: 'flex-start' }}>
             <RunButton runCode={runCode} />
+          </Box>
+          <Box sx={{ position: 'absolute', bottom: 0, right: 0, p: 2, display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: 1 }}>
+            {users.map((user, index) => (
+              <Box key={index} sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                <Avatar sx={{ bgcolor: user.color, width: 24, height: 24, mr: 1 }} />
+                <Typography>{user.name}</Typography>
+              </Box>
+            ))}
           </Box>
         </Grid>
       </Grid>

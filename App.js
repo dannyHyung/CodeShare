@@ -20,6 +20,20 @@ app.use(express.static(path.join(__dirname, '../client/build'))); // Serve React
 let currentCode = ''; // Store the current code
 let currentLanguage = 'javascript';
 let currentQuestion = '';
+let onlineUsers = {};
+
+const generateRandomColor = () => {
+    const letters = '0123456789ABCDEF';
+    let color = '#';
+    for (let i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+};
+
+const broadcastUsersUpdate = () => {
+    io.emit('usersUpdate', Object.values(onlineUsers));
+};
 
 io.on('connection', (socket) => {
     console.log('New client connected');
@@ -27,6 +41,11 @@ io.on('connection', (socket) => {
     socket.emit('codeChange', currentCode);
     socket.emit('initialLanguage', currentLanguage);
     socket.emit('questionChange', currentQuestion);
+
+    socket.on('setUsername', (username) => {
+        onlineUsers[socket.id] = { name: username, color: generateRandomColor() };
+        broadcastUsersUpdate();
+    });
 
     socket.on('codeChange', (code) => {
         currentCode = code; // Update the current code
@@ -105,6 +124,8 @@ io.on('connection', (socket) => {
     });
 
     socket.on('disconnect', () => {
+        delete onlineUsers[socket.id];
+        broadcastUsersUpdate();
         console.log('Client disconnected');
     });
 });
