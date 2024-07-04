@@ -18,6 +18,7 @@ function App() {
   const [username, setUsername] = useState('');
   const [users, setUsers] = useState([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [typingUsers, setTypingUsers] = useState([]);
 
   useEffect(() => {
     socket.on('connect', () => {
@@ -62,6 +63,16 @@ function App() {
       setOutput(result);
     });
 
+    socket.on('userTyping', ({ username, isTyping }) => {
+      setTypingUsers(prev => {
+        if (isTyping) {
+          return [...new Set([...prev, username])];
+        } else {
+          return prev.filter(user => user !== username);
+        }
+      });
+    });
+
     socket.emit('requestCode');
     socket.emit('requestQuestion');
     socket.emit('requestLanguage');
@@ -74,6 +85,7 @@ function App() {
       socket.off('questionChange');
       socket.off('languageChange');
       socket.off('codeOutput');
+      socket.off('userTyping');
     };
   }, []);
 
@@ -95,6 +107,11 @@ function App() {
     if (field === 'code') {
       setCode(value);
       socket.emit('codeChange', value);
+      socket.emit('userTyping', { username, isTyping: true });
+      clearTimeout(window.typingTimeout);
+      window.typingTimeout = setTimeout(() => {
+        socket.emit('userTyping', { username, isTyping: false });
+      }, 1000);
     } else if (field === 'language') {
       setLanguage(value);
       socket.emit('languageChange', value);
@@ -132,13 +149,22 @@ function App() {
           <Box sx={{ display: 'flex', justifyContent: 'flex-start' }}>
             <RunButton runCode={runCode} />
           </Box>
-          <Box sx={{ position: 'absolute', bottom: 0, right: 0, p: 2, display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: 1 }}>
-            {users.map((user, index) => (
-              <Box key={index} sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                <Avatar sx={{ bgcolor: user.color, width: 24, height: 24, mr: 1 }} />
-                <Typography>{user.name}</Typography>
-              </Box>
-            ))}
+          <Box sx={{ position: 'absolute', bottom: 0, left: 0, right: 0, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', p: 2 }}>
+            <Box>
+              {typingUsers.length > 0 && (
+                <Typography sx={{ fontStyle: 'italic', color: '#005f99' }}>
+                  {typingUsers.join(', ')} {typingUsers.length === 1 ? 'is' : 'are'} typing...
+                </Typography>
+              )}
+            </Box>
+            <Box sx={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: 1, justifyContent: 'flex-end' }}>
+              {users.map((user, index) => (
+                <Box key={index} sx={{ display: 'flex', alignItems: 'center' }}>
+                  <Avatar sx={{ bgcolor: user.color, width: 24, height: 24, mr: 1 }} />
+                  <Typography>{user.name}</Typography>
+                </Box>
+              ))}
+            </Box>
           </Box>
         </Grid>
       </Grid>

@@ -123,6 +123,10 @@ io.on('connection', (socket) => {
         });
     });
 
+    socket.on('userTyping', ({ username, isTyping }) => {
+        socket.broadcast.emit('userTyping', { username, isTyping });
+    });
+
     socket.on('disconnect', () => {
         delete onlineUsers[socket.id];
         broadcastUsersUpdate();
