@@ -68,7 +68,10 @@ io.on('connection', (socket) => {
 
         switch (language) {
             case 'javascript':
-                command = `node -e "${code.replace(/"/g, '\\"')}"`;
+                const tmpFileJs = tmp.fileSync({ postfix: '.js' });
+                fs.writeFileSync(tmpFileJs.name, code);
+                command = `node ${tmpFileJs.name}`;
+                cleanupCallback = () => tmpFileJs.removeCallback();
                 break;
             case 'python':
                 const tmpFilePython = tmp.fileSync({ postfix: '.py' });
