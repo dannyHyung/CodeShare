@@ -152,7 +152,7 @@ function App() {
           <Box sx={{ position: 'absolute', bottom: 0, left: 0, right: 0, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', p: 2 }}>
             <Box>
               {typingUsers.length > 0 && (
-                <Typography sx={{ fontStyle: 'italic', color: '#005f99' }}>
+                <Typography sx={{ fontStyle: 'italic', color: '#0A21C0' }}>
                   {typingUsers.join(', ')} {typingUsers.length === 1 ? 'is' : 'are'} typing...
                 </Typography>
               )}
