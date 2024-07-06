@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon App.js",
+    "test": "node App.js",
     "dev": "concurrently \"npm run start \" \"cd client && npm start\" "
   },
   "author": "",
