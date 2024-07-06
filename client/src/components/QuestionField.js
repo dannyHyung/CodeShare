@@ -13,16 +13,23 @@ const QuestionField = ({ question, handleQuestionChange }) => (
             flexGrow: 1,
             mr: 2,
             '& .MuiOutlinedInput-root': {
-                '& fieldset': { borderColor: '#007acc' },
-                '&:hover fieldset': { borderColor: '#005f99' },
-                '&.Mui-focused fieldset': { borderColor: '#007acc' },
+                '& fieldset': {
+                    borderColor: '#2C2E3A', // Default border color
+                },
+                '&:hover fieldset': {
+                    borderColor: '#0A21C0', // Border color on hover
+                },
+                '&.Mui-focused fieldset': {
+                    borderColor: '#0A21C0', // Border color when focused
+                },
             },
             '& .MuiInputBase-input': {
                 color: '#ffffff',
                 fontSize: '14px',
             },
-            '& .MuiOutlinedInput-input': { backgroundColor: '#2d2d2d' },
-            '& .MuiOutlinedInput-notchedOutline': { borderColor: '#007acc' },
+            '& .MuiOutlinedInput-input': { 
+                backgroundColor: '#2C2E3A' 
+            },
         }}
     />
 );

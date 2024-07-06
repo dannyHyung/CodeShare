@@ -3,19 +3,54 @@ import { FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 
 const LanguageSelector = ({ language, handleLanguageChange }) => (
     <FormControl variant="outlined" sx={{ mr: 2, minWidth: 120 }}>
-        <InputLabel sx={{ color: '#ffffff' }}>Language</InputLabel>
+        <InputLabel
+            sx={{
+                color: '#0A21C0',
+                '&.Mui-focused': {
+                    color: '#0A21C0'
+                }
+            }}
+        >
+            Language
+        </InputLabel>
         <Select
             value={language}
             onChange={handleLanguageChange}
             label="Language"
             sx={{
-                color: '#ffffff',
-                '& .MuiOutlinedInput-root': {
-                    '& fieldset': { borderColor: '#007acc' },
-                    '&:hover fieldset': { borderColor: '#005f99' },
-                    '&.Mui-focused fieldset': { borderColor: '#007acc' },
+                color: '#0A21C0',
+                '& .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#2C2E3A', // Default border color
                 },
-                '& .MuiSelect-icon': { color: '#ffffff' },
+                '&:hover .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#0A21C0', // Border color on hover
+                },
+                '& .MuiSelect-icon': {
+                    color: '#0A21C0' // Icon color
+                },
+                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#0A21C0', // Ensure border is white when dropdown is open
+                    borderWidth: 1
+                },
+            }}
+            MenuProps={{
+                PaperProps: {
+                    sx: {
+                        bgcolor: '#141619',
+                        '& .MuiMenuItem-root': {
+                            color: '#0A21C0',
+                            '&:hover': {
+                                bgcolor: '#B3B4BD',
+                            },
+                            '&.Mui-selected': {
+                                bgcolor: '#B3B4BD',
+                                '&:hover': {
+                                    bgcolor: 'rgba(255, 255, 255, 0.24)',
+                                },
+                            },
+                        },
+                    },
+                },
             }}
         >
             <MenuItem value="javascript">JavaScript</MenuItem>

@@ -122,7 +122,7 @@ function App() {
   };
 
   return (
-    <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column', bgcolor: '#1e1e1e', color: '#ffffff' }}>
+    <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column', bgcolor: '#141619', color: '#ffffff' }}>
       <UsernameDialog
         open={isDialogOpen}
         username={username}
@@ -140,13 +140,13 @@ function App() {
       </Grid>
       <Grid container spacing={2} sx={{ height: '100vh' }}>
         <Grid item xs={8}>
-          <Paper sx={{ p: 2, bgcolor: '#2d2d2d' }}>
+          <Paper sx={{ p: 2, bgcolor: '#2C2E3A' }}>
             <CodeEditor code={code} language={language} setCode={handleChange('code')} />
           </Paper>
         </Grid>
         <Grid item xs={4} sx={{ position: 'relative' }}>
           <OutputBox output={output} />
-          <Box sx={{ display: 'flex', justifyContent: 'flex-start' }}>
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt:2 }}>
             <RunButton runCode={runCode} />
           </Box>
           <Box sx={{ position: 'absolute', bottom: 0, left: 0, right: 0, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', p: 2 }}>

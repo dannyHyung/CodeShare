@@ -3,9 +3,18 @@ import { Button } from '@mui/material';
 
 const RunButton = ({ runCode }) => (
     <Button
-        variant="contained"
+        variant="outlined"
         onClick={runCode}
-        sx={{ bgcolor: '#007acc', '&:hover': { bgcolor: '#005f99' } }}
+        sx={{
+            color: '#ffffff',
+            backgroundColor: '#2C2E3A',
+            borderColor: '#2C2E3A',
+            '&:hover': {
+                backgroundColor: '#2C2E3A',
+                borderColor: '#0A21C0',
+                color: '#ffffff',
+            },
+        }}
     >
         Run
     </Button>
