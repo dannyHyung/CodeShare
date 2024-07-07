@@ -5,8 +5,9 @@ const { exec } = require('child_process');
 const path = require('path');
 const tmp = require('tmp');
 const fs = require('fs');
-
+const cors = require('cors');
 const app = express();
+
 const server = http.createServer(app);
 const io = socketIo(server, {
     cors: {
@@ -14,6 +15,11 @@ const io = socketIo(server, {
         methods: ["GET", "POST"]
     }
 });
+
+app.use(cors({
+    origin: "http://localhost:3000", // Replace with your frontend URL if different
+    methods: ["GET", "POST"]
+}));
 
 app.use(express.static(path.join(__dirname, '../client/build'))); // Serve React app
 
