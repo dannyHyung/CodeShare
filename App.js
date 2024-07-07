@@ -9,15 +9,19 @@ const cors = require('cors');
 const app = express();
 
 const server = http.createServer(app);
+
+const allowedOrigins = process.env.ALLOWED_ORIGINS 
+    ? process.env.ALLOWED_ORIGINS.split(',') 
+    : ['https://codeshare-5ewf.onrender.com'];
 const io = socketIo(server, {
     cors: {
-        origin: "https://codeshare-5ewf.onrender.com", // Replace with your frontend URL if different
+        origin: allowedOrigins, // Replace with your frontend URL if different
         methods: ["GET", "POST"]
     }
 });
 
 app.use(cors({
-    origin: "https://codeshare-5ewf.onrender.com", // Replace with your frontend URL if different
+    origin: allowedOrigins, // Replace with your frontend URL if different
     methods: ["GET", "POST"]
 }));
 
