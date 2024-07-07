@@ -11,13 +11,13 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server, {
     cors: {
-        origin: "http://localhost:3000", // Replace with your frontend URL if different
+        origin: "https://codeshare-5ewf.onrender.com", // Replace with your frontend URL if different
         methods: ["GET", "POST"]
     }
 });
 
 app.use(cors({
-    origin: "http://localhost:3000", // Replace with your frontend URL if different
+    origin: "https://codeshare-5ewf.onrender.com", // Replace with your frontend URL if different
     methods: ["GET", "POST"]
 }));
 

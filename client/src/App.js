@@ -8,7 +8,8 @@ import RunButton from './components/RunButton';
 import OutputBox from './components/OutputBox';
 import UsernameDialog from './components/UsernameDialog';
 
-const socket = io(process.env.REACT_APP_BACKEND_URL || 'http://localhost:4000');
+// const socket = io(process.env.REACT_APP_BACKEND_URL || 'http://localhost:4000');
+const socket = io(process.env.REACT_APP_BACKEND_URL || 'https://codeshare-backend-q99a.onrender.com');
 
 function App() {
   const [code, setCode] = useState('');
